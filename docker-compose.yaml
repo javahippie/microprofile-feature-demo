@@ -29,8 +29,19 @@ services:
     environment:
       KEYCLOAK_USER: admin 
       KEYCLOAK_PASSWORD: password 
-#  inventory:
-#    hostname: inventory
-#  pricing:
-#    hostname: pricing
- 
+  inventory:
+    hostname: inventory
+    image: javahippie/mp-demo-inventory:0.1.0
+    ports:
+      - 83:9080
+  pricing:
+    hostname: pricing
+    image: javahippie/mp-demo-pricing:0.1.0
+    ports:
+      - 82:9080
+
+networks:
+  front:
+      driver: bridge
+  back:
+      driver: overlay 

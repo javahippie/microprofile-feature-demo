@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<server description="pricing">
+<server description="inventory">
 
     <featureManager>
         <feature>microProfile-3.3</feature>
@@ -9,7 +9,7 @@
                   httpPort="9080"
                   httpsPort="9443"/>
 
-    <webApplication location="pricing.war" contextRoot="/">
+    <webApplication location="inventory.war" contextRoot="/">
         <classloader apiTypeVisibility="+third-party" />
     </webApplication>
     <mpMetrics authentication="false"/>
@@ -18,7 +18,11 @@
     <keyStore id="defaultKeyStore" location="public.jks" type="JKS" password="atbash" />
 
 
-    <!-- The MP JWT configuration that injects the caller's JWT into a ResourceScoped bean for inspection. -->
-    <mpJwt id="jwtUserConsumer" keyName="theKeyId" audiences="targetService" issuer="${jwt.issuer}"/>
-
+    <mpJwt
+        id="myMpJwt"
+        jwksUri="http://localhost:81/auth/realms/master/protocol/openid-connect/certs"
+        issuer="http://localhost:81/auth/realms/master"
+        userNameAttribute="preferred_username"
+        audiences="jax">
+    </mpJwt>
 </server>

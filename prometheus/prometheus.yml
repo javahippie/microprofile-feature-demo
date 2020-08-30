@@ -9,4 +9,9 @@ scrape_configs:
     scrape_interval: 2s
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['docker.for.mac.host.internal:9080']
+      - targets: ['docker.for.mac.host.internal:82']
+  - job_name: 'inventory'
+    scrape_interval: 2s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['docker.for.mac.host.internal:83']
