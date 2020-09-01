@@ -2,9 +2,29 @@
 version: '3.8'
 
 services:
+  traefik:
+    image: "traefik:v2.2"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    networks:
+      - internal_net
+      - external_net
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
   jaeger:
     hostname: jaeger
-    image: jaegertracing/all-in-one:1.19
+    image: jaegertracing/all-in-one:1.19.2
+    networks:
+      - internal_net
     ports: 
       - 5775:5775/udp
       - 6831:6831/udp
@@ -14,16 +34,32 @@ services:
       - 14268:14268
       - 14250:14250
       - 9411:9411
+    environment:
+      QUERY_BASE_PATH: /jaeger
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jaeger.rule=Host(`jaeger.localhost`)"
+      - "traefik.http.routers.jaeger.entrypoints=web"
+      - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
   prometheus:
     hostname: prometheus
     image: prom/prometheus
+    networks:
+      - internal_net
     volumes:
       - ./prometheus:/etc/prometheus
     ports: 
       - 9090:9090
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
+      - "traefik.http.routers.prometheus.entrypoints=web"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
   keycloak:
     hostname: keycloak
     image: jboss/keycloak
+    networks:
+      - internal_net
     ports: 
       - 81:8080
     environment:
@@ -32,16 +68,34 @@ services:
   inventory:
     hostname: inventory
     image: javahippie/mp-demo-inventory:0.1.0
+    networks:
+      - internal_net
     ports:
       - 83:9080
+    environment:
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.inventory.rule=Host(`inventory.localhost`)"
+      - "traefik.http.routers.inventory.entrypoints=web"
+      - "traefik.http.services.inventory.loadbalancer.server.port=9080"
   pricing:
     hostname: pricing
+    networks: 
+      - internal_net
     image: javahippie/mp-demo-pricing:0.1.0
     ports:
       - 82:9080
+    environment:
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pricing.rule=Host(`pricing.localhost`)"
+      - "traefik.http.routers.pricing.entrypoints=web"
+      - "traefik.http.services.pricing.loadbalancer.server.port=9080"
 
 networks:
-  front:
-      driver: bridge
-  back:
-      driver: overlay 
+  internal_net:
+    internal: true
+  external_net:
+       
