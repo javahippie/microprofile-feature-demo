@@ -6,8 +6,8 @@
     </featureManager>
 
     <httpEndpoint id="defaultHttpEndpoint"
-                  httpPort="9080"
-                  httpsPort="9443"/>
+                  httpPort="9081"
+                  httpsPort="9444"/>
 
     <webApplication location="inventory.war" contextRoot="/">
         <classloader apiTypeVisibility="+third-party" />
@@ -20,9 +20,9 @@
 
     <mpJwt
         id="myMpJwt"
-        jwksUri="http://localhost:81/auth/realms/master/protocol/openid-connect/certs"
-        issuer="http://localhost:81/auth/realms/master"
+        jwksUri="${env.KEYCLOAK_JWKS}"
+        issuer="${env.KEYCLOAK_ISSUER}"
         userNameAttribute="preferred_username"
-        audiences="jax">
+        audiences="account">
     </mpJwt>
 </server>

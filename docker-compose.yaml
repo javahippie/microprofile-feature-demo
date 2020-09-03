@@ -10,9 +10,12 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.keycloak.address=:8080"
+      - "--entrypoints.traefik.address=:8081"
     ports:
       - "80:80"
       - "8080:8080"
+      - "8081:8081"
     networks:
       - internal_net
       - external_net
@@ -30,7 +33,7 @@ services:
       - 16686:16686
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.jaeger.rule=Host(`jaeger.localhost`)"
+      - "traefik.http.routers.jaeger.rule=Host(`jaeger`)"
       - "traefik.http.routers.jaeger.entrypoints=web"
       - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
 
@@ -45,7 +48,7 @@ services:
       - 9090:9090
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(`prometheus.localhost`)"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus`)"
       - "traefik.http.routers.prometheus.entrypoints=web"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
@@ -58,45 +61,48 @@ services:
       KEYCLOAK_USER: admin 
       KEYCLOAK_PASSWORD: password 
       KEYCLOAK_IMPORT: /tmp/config/prebuilt-realms.json
+    #command: ["-Djboss.socket.binding.port-offset=-8000"]
     volumes:
       - ./keycloak:/tmp/config/
     ports:
       - 8080:8080
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.rule=Host(`keycloak.localhost`)"
-      - "traefik.http.routers.keycloak.entrypoints=web"
+      - "traefik.http.routers.keycloak.rule=Host(`keycloak`)"
+      - "traefik.http.routers.keycloak.entrypoints=keycloak"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
 
   inventory:
     hostname: inventory
-    image: javahippie/mp-demo-inventory:0.1.0
+    image: javahippie/mp-demo-inventory:0.1.1
     networks:
       - internal_net
     environment:
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      KEYCLOAK_JWKS: http://keycloak:8080/auth/realms/MicroProfile/protocol/openid-connect/certs 
+      KEYCLOAK_ISSUER: http://keycloak:8080/auth/realms/MicroProfile
     ports:
-      - 9080:9080
+      - 9081:9081
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.inventory.rule=Host(`inventory.localhost`)"
+      - "traefik.http.routers.inventory.rule=Host(`inventory`)"
       - "traefik.http.routers.inventory.entrypoints=web"
-      - "traefik.http.services.inventory.loadbalancer.server.port=9080"
+      - "traefik.http.services.inventory.loadbalancer.server.port=9081"
 
   pricing:
     hostname: pricing
     networks: 
       - internal_net
-    image: javahippie/mp-demo-pricing:0.1.0
+    image: javahippie/mp-demo-pricing:0.1.1
     environment:
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
     ports:
-      - 9080:9080
+      - 9082:9082
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pricing.rule=Host(`pricing.localhost`)"
+      - "traefik.http.routers.pricing.rule=Host(`pricing`)"
       - "traefik.http.routers.pricing.entrypoints=web"
-      - "traefik.http.services.pricing.loadbalancer.server.port=9080"
+      - "traefik.http.services.pricing.loadbalancer.server.port=9082"
 
 networks:
   internal_net:

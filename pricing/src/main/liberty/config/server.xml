@@ -6,8 +6,8 @@
     </featureManager>
 
     <httpEndpoint id="defaultHttpEndpoint"
-                  httpPort="9080"
-                  httpsPort="9443"/>
+                  httpPort="9082"
+                  httpsPort="9445"/>
 
     <webApplication location="pricing.war" contextRoot="/">
         <classloader apiTypeVisibility="+third-party" />
@@ -18,7 +18,12 @@
     <keyStore id="defaultKeyStore" location="public.jks" type="JKS" password="atbash" />
 
 
-    <!-- The MP JWT configuration that injects the caller's JWT into a ResourceScoped bean for inspection. -->
-    <mpJwt id="jwtUserConsumer" keyName="theKeyId" audiences="targetService" issuer="${jwt.issuer}"/>
+    <mpJwt
+        id="myMpJwt"
+        jwksUri="${env.KEYCLOAK_JWKS}"
+        issuer="${env.KEYCLOAK_ISSUER}"
+        userNameAttribute="preferred_username"
+        audiences="account">
+    </mpJwt>
 
 </server>

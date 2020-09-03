@@ -2,7 +2,6 @@ package de.javhippie.jax2020.inventory;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.security.DeclareRoles;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;import javax.ws.rs.GET;
@@ -11,7 +10,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import org.eclipse.microprofile.auth.LoginConfig;
-import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 /**
