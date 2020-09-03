@@ -9,9 +9,19 @@ scrape_configs:
     scrape_interval: 2s
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['pricing:9080']
+      - targets: ['pricing:9082']
   - job_name: 'inventory'
     scrape_interval: 2s
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['inventory:9080']
+      - targets: ['inventory:9081']
+  - job_name: 'checkout'
+    scrape_interval: 2s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['host.docker.internal:9999']
+  - job_name: 'jaeger'
+    scrape_interval: 2s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['jaeger:14269']

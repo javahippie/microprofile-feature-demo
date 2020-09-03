@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -40,10 +41,28 @@ public class InventoryController {
     @GET
     @Produces("application/json")
     @RolesAllowed({"view-profile", "uma_protection", "uma_authorization"})
-    public Response sayHello(@QueryParam("productNumber") String productNumber) {
+    public Response getProductAmount(@QueryParam("productNumber") String productNumber) throws InterruptedException {
+        if(!inventory.containsKey(productNumber)) {
+            Thread.sleep(5000L);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(inventory.get(productNumber)).build();
+        }
+    }
+    
+    @PUT
+    @Produces("application/json")
+    @RolesAllowed({"view-profile", "uma_protection", "uma_authorization"})
+    @Path("reduce")
+    public Response reduceInventory(@QueryParam("productNumber") String productNumber, @QueryParam("amount") Integer amountToReduce) {
         if(!inventory.containsKey(productNumber)) {
             return Response.status(Response.Status.NOT_FOUND).build();
         } else {
+            Integer currentAmount = inventory.get(productNumber);
+            if(amountToReduce > currentAmount) {
+                return Response.status(500, "Cannot create a negative inventory").build();
+            }
+            inventory.put(productNumber, currentAmount - amountToReduce);
             return Response.ok(inventory.get(productNumber)).build();
         }
     }

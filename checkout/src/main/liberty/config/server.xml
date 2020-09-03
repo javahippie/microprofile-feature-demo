@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="${project.name}">
+
+    <featureManager>
+        <feature>microProfile-3.3</feature>
+    </featureManager>
+
+    <httpEndpoint id="defaultHttpEndpoint"
+                  httpPort="9999"
+                  httpsPort="9443"/>
+
+    <webApplication location="${project.name}.war" contextRoot="/">
+        <classloader apiTypeVisibility="+third-party" />
+    </webApplication>
+    <mpMetrics authentication="false"/>
+
+    <!-- This is the keystore that will be used by SSL and by JWT. -->
+    <keyStore id="defaultKeyStore" location="public.jks" type="JKS" password="atbash" />
+
+    
+    
+    <mpJwt
+        id="myMpJwt"
+        jwksUri="http://keycloak:8080/auth/realms/MicroProfile/protocol/openid-connect/certs"
+        issuer="http://keycloak:8080/auth/realms/MicroProfile"
+        userNameAttribute="preferred_username"
+        audiences="account">
+    </mpJwt>
+
+</server>

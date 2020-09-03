@@ -5,7 +5,7 @@ services:
   traefik:
     image: "traefik:v2.2"
     command:
-      #- "--log.level=DEBUG"
+      # - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
@@ -16,6 +16,7 @@ services:
       - "80:80"
       - "8080:8080"
       - "8081:8081"
+      - "14268:14268"
     networks:
       - internal_net
       - external_net
@@ -27,21 +28,33 @@ services:
     image: jaegertracing/all-in-one:1.19.2
     networks:
       - internal_net
-    environment:
-      QUERY_BASE_PATH: /jaeger
     ports:
-      - 16686:16686
+      - 5775:5775/udp 
+      - 6831:6831/udp 
+      - 6832:6832/udp 
+      - 5778:5778 
+      - 16686:16686 
+      - 14268:14268 
+      - 14250:14250 
+      - 9411:9411 
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jaeger.rule=Host(`jaeger`)"
       - "traefik.http.routers.jaeger.entrypoints=web"
+      - "traefik.http.routers.jaeger.service=jaeger"
       - "traefik.http.services.jaeger.loadbalancer.server.port=16686"
+      
+      - "traefik.http.routers.jaeger-api.rule=Host(`jaeger-api`)"
+      - "traefik.http.routers.jaeger-api.entrypoints=web"
+      - "traefik.http.routers.jaeger-api.service=jaeger-api"
+      - "traefik.http.services.jaeger-api.loadbalancer.server.port=14268"
 
   prometheus:
     hostname: prometheus
     image: prom/prometheus
     networks:
       - internal_net
+      - external_net
     volumes:
       - ./prometheus:/etc/prometheus
     ports:
@@ -78,6 +91,8 @@ services:
     networks:
       - internal_net
     environment:
+      JAEGER_SAMPLER_TYPE: const
+      JAEGER_SAMPLER_PARAM: 1
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
       KEYCLOAK_JWKS: http://keycloak:8080/auth/realms/MicroProfile/protocol/openid-connect/certs 
       KEYCLOAK_ISSUER: http://keycloak:8080/auth/realms/MicroProfile
@@ -95,7 +110,11 @@ services:
       - internal_net
     image: javahippie/mp-demo-pricing:0.1.1
     environment:
+      JAEGER_SAMPLER_TYPE: const
+      JAEGER_SAMPLER_PARAM: 1
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      KEYCLOAK_JWKS: http://keycloak:8080/auth/realms/MicroProfile/protocol/openid-connect/certs
+      KEYCLOAK_ISSUER: http://keycloak:8080/auth/realms/MicroProfile
     ports:
       - 9082:9082
     labels:
