@@ -87,7 +87,7 @@ services:
 
   inventory:
     hostname: inventory
-    image: javahippie/mp-demo-inventory:0.1.1
+    image: javahippie/mp-demo-inventory:0.1.2
     networks:
       - internal_net
     environment:
@@ -108,7 +108,7 @@ services:
     hostname: pricing
     networks: 
       - internal_net
-    image: javahippie/mp-demo-pricing:0.1.1
+    image: javahippie/mp-demo-pricing:0.1.2
     environment:
       JAEGER_SAMPLER_TYPE: const
       JAEGER_SAMPLER_PARAM: 1
