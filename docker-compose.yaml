@@ -12,6 +12,8 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.keycloak.address=:8080"
       - "--entrypoints.traefik.address=:8081"
+      #- "--tracing.jaeger.samplingServerURL=http://jaeger-api/api/traces"
+      #- "--tracing.jaeger.samplingType=const"
     ports:
       - "80:80"
       - "8080:8080"
