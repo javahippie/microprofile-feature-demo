@@ -6,6 +6,8 @@
 package health;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.Readiness;
 
@@ -14,12 +16,15 @@ import org.eclipse.microprofile.health.Readiness;
  * @author zoeller
  */
 @Readiness
-@ApplicationScoped
 public class HealthCheck implements org.eclipse.microprofile.health.HealthCheck {
+    
+    @Inject
+    @ConfigProperty(name = "javahippie.application.name")
+    private String healthCheckName;
 
     @Override
     public HealthCheckResponse call() {
-        return new HealthCheckResponse("General", HealthCheckResponse.State.UP, null);
+        return new HealthCheckResponse(healthCheckName, HealthCheckResponse.State.UP, null);
     }
     
 }
