@@ -27,6 +27,8 @@ services:
 
   jaeger:
     hostname: jaeger
+    depends_on:
+      - traefik
     image: jaegertracing/all-in-one:1.19.2
     networks:
       - internal_net
@@ -53,6 +55,8 @@ services:
 
   prometheus:
     hostname: prometheus
+    depends_on:
+      - traefik
     image: prom/prometheus
     networks:
       - internal_net
@@ -69,6 +73,8 @@ services:
 
   keycloak:
     hostname: keycloak
+    depends_on:
+      - traefik
     image: jboss/keycloak
     networks:
       - internal_net
@@ -89,6 +95,8 @@ services:
 
   inventory:
     hostname: inventory
+    depends_on:
+      - traefik
     image: javahippie/mp-demo-inventory:0.1.2
     networks:
       - internal_net
@@ -108,6 +116,8 @@ services:
 
   pricing:
     hostname: pricing
+    depends_on:
+      - traefik
     networks: 
       - internal_net
     image: javahippie/mp-demo-pricing:0.1.2
