@@ -7,6 +7,7 @@ You need to add some hostnames to your local hosts file for the network to work 
 * inventory
 * pricing
 
+After the hosts are configures, run `docker-compose up` from the root folder.
 Keycloak takes some minutes to start, wait for a success message, here
 
 # Starting the application
